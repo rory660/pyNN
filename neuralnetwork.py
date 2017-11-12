@@ -3,9 +3,9 @@ import math
 
 # x        = input
 # y        = desired output
-# w(n)     = weights for synapse layer n
-# z(n)     = neuron values calculated from inputs and weights for layer n
-# a(n)     = neuron values after normalisation on layer n
+# w[n]     = weights for synapse layer n (counting from 0)
+# z[n]     = neuron values calculated from inputs and weights for layer n+1
+# a[n]     = neuron values after normalisation on layer n+1
 # yHat     = output value, normalised value of final z
 # j        = cost function of yHat vs y
 # delta(n) = gradient at layer n
@@ -18,19 +18,27 @@ class NeuralNetwork:
 	def __init__(self):
 		self.inputLayerSize = 1
 		self.outputLayerSize = 1
-		self.hiddenLayerSize = [5,5]
+		self.hiddenLayerSize = [5,5,5]
 
-		self.w1 = np.random.rand(self.inputLayerSize, self.hiddenLayerSize[0])
-		self.w2 = np.random.rand(self.hiddenLayerSize[0], self.hiddenLayerSize[1])
-		self.w3 = np.random.rand(self.hiddenLayerSize[1], self.outputLayerSize)
+		self.w = []
+		self.w.append(np.random.rand(self.inputLayerSize, self.hiddenLayerSize[0]))
+		for i in range(len(self.hiddenLayerSize)-1):
+			self.w.append(np.random.rand(self.hiddenLayerSize[i+1], self.hiddenLayerSize[i]))
+		self.w.append(np.random.rand(self.hiddenLayerSize[-1], self.outputLayerSize))
+
+		self.z = [float(0)]*(len(self.hiddenLayerSize)+1)
+		self.a = [float(0)]*(len(self.hiddenLayerSize))
 
 	def forward(self, x):
-		self.z2 =np.dot(x,self.w1)
-		self.a2 = self.sigmoid(self.z2)
-		self.z3 = np.dot(self.a2,self.w2)
-		self.a3 = self.sigmoid(self.z3)
-		self.z4 = np.dot(self.a3,self.w3)
-		yHat = self.sigmoid(self.z4)
+		self.z[0] =np.dot(x,self.w[0])
+		self.a[0] = self.sigmoid(self.z[0])
+
+		for i in range(1,len(self.a)):
+			self.z[i] = np.dot(self.a[i-1],self.w[i])
+			self.a[i] = self.sigmoid(self.z[i])
+
+		self.z[-1] = np.dot(self.a[-1],self.w[-1])
+		yHat = self.sigmoid(self.z[-1])
 		return yHat
 
 	def sigmoid(self, n):
@@ -46,21 +54,52 @@ class NeuralNetwork:
 
 	def costFunctionPrime(self, x, y):
 		self.yHat = self.forward(x)
-		delta4 = np.multiply(-(y-self.yHat), self.sigmoidPrime(self.z4))
-		djdw3 = np.dot(self.a3.T, delta4)
 
-		delta3 = np.dot(delta4, self.w3.T)*self.sigmoidPrime(self.z3)
-		djdw2 = np.dot(self.a2.T,delta3)
+		djdw = []
+		delta = np.multiply(-(y-self.yHat), self.sigmoidPrime(self.z[-1]))
+		djdw.append(np.dot(self.a[-1].T, delta))
 
-		delta2 = np.dot(delta3, self.w2.T)*self.sigmoidPrime(self.z2)
-		djdw1 = np.dot(x.T,delta2)
+		for i in range(len(self.z)-2,0,-1):
+		 	delta = np.dot(delta, self.w[i+1].T)*self.sigmoidPrime(self.z[i])
+			djdw.append(np.dot(self.a[i-1].T,delta))
 
-		return djdw1, djdw2, djdw3
+		# delta = np.dot(delta, self.w[2].T)*self.sigmoidPrime(self.z[1])
+		# djdw.append(np.dot(self.a[0].T,delta))
+
+		delta = np.dot(delta, self.w[1].T)*self.sigmoidPrime(self.z[0])
+		djdw.append(np.dot(x.T,delta))
+
+		return list(reversed(djdw))
 
 	def correctWeights(self, x, y):
-		djdw1, djdw2, djdw3 = self.costFunctionPrime(x,y)
 		s = 10
-		self.w1 = self.w1 - s * djdw1
-		self.w2 = self.w2 - s * djdw2
-		self.w3 = self.w3 - s * djdw3
+		djdwList = self.costFunctionPrime(x,y)
+		for i in range(len(djdwList)):
+			self.w[i] = self.w[i] - s * djdwList[i]
 
+# Usage Format:
+# Inputs are always numpy arrays.
+# To calculate an output from an input use forward(x), where x is a numpy array of inputs (num of iterations * num of inputs per iteration)
+# To correct the weights use correctWeights(x,y), where x is an array of inputs and y is an array of desired outputs. This increments the weight values in favour of the desired outputs.
+# Always use values between 0 and 1.
+
+# Example network:
+
+# nn = NeuralNetwork()
+# x = np.array([[7485],[6503],[4719]], dtype = float)
+# x = x/8000
+# y = np.array([[7000],[6000],[2000]], dtype = float)
+# y = y/8000
+
+# i=0
+# running = True
+# while running:
+# 	i+=1
+# 	if i > 100:
+# 		print y
+# 		print nn.forward(x)
+# 		if raw_input() == "quit":
+# 			running = False
+# 		else:
+# 			i=0
+# 	nn.correctWeights(x,y)
