@@ -64,22 +64,3 @@ class NeuralNetwork:
 		self.w2 = self.w2 - s * djdw2
 		self.w3 = self.w3 - s * djdw3
 
-nn = NeuralNetwork()
-running = True
-i=0
-x = np.array([[7485],[6503],[4719]], dtype = float)
-x = x/8000
-y = np.array([[7000],[6000],[2000]], dtype = float)
-y = y/8000
-
-
-while running:
-	i+=1
-	if i > 100:
-		print y
-		print nn.forward(x)
-		if raw_input() == "quit":
-			running = False
-		else:
-			i=0
-	nn.correctWeights(x,y)
