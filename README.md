@@ -6,8 +6,7 @@ This was built as a learning exercise.
 ### This module requires [Python 2.7](https://www.python.org/downloads/) and [NumPy](http://www.numpy.org/) to be used.  
 ## The NeuralNetwork Class
 The NeuralNetwork Class allows for the creation of Neural Network objects, which are input, output and hidden layer configurable.  
-### Constructor:
-**NeuralNetwork(int inputSize, int outputSize, list hiddenLayerSizes)**  
+### Constructor: NeuralNetwork(int inputSize, int outputSize, list hiddenLayerSizes)  
 *inputSize* determines the number of input nodes for the network.  
 *outputSize* determines the number of output nodes for the network.  
 *hiddenLayerSizes* is a list containing the number of nodes for each hidden layer of the network.  
