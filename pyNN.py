@@ -9,16 +9,16 @@ import math
 # yHat     = output value, normalised value of final z
 # j        = cost function of yHat vs y
 # delta(n) = gradient at layer n
-# djdw(n)  = gradient applied to a(n+1)?
+# djdw(n)  = (delta j / delta w)
 # s        = scalar value to determine weight change step
 
 
 class NeuralNetwork:
 
-	def __init__(self):
-		self.inputLayerSize = 1
-		self.outputLayerSize = 1
-		self.hiddenLayerSize = [5,5,5]
+	def __init__(self, inputSize = 1, outputSize = 1, hiddenLayerSizes = [3]):
+		self.inputLayerSize = inputSize
+		self.outputLayerSize = outputSize
+		self.hiddenLayerSize = hiddenLayerSizes
 
 		self.w = []
 		self.w.append(np.random.rand(self.inputLayerSize, self.hiddenLayerSize[0]))
@@ -68,7 +68,6 @@ class NeuralNetwork:
 
 		delta = np.dot(delta, self.w[1].T)*self.sigmoidPrime(self.z[0])
 		djdw.append(np.dot(x.T,delta))
-
 		return list(reversed(djdw))
 
 	def correctWeights(self, x, y):
@@ -76,6 +75,19 @@ class NeuralNetwork:
 		djdwList = self.costFunctionPrime(x,y)
 		for i in range(len(djdwList)):
 			self.w[i] = self.w[i] - s * djdwList[i]
+
+	def exportDetails(self):
+		return [self.inputLayerSize,self.hiddenLayerSize,self.outputLayerSize,self.w]
+
+	def importDetails(self,importList):
+		self.inputLayerSize=importList[0]
+		self.hiddenLayerSize=importList[1]
+		self.outputLayerSize=importList[2]
+		self.w=importList[3]
+
+		self.z = [float(0)]*(len(self.hiddenLayerSize)+1)
+		self.a = [float(0)]*(len(self.hiddenLayerSize))
+
 
 # Usage Format:
 # Inputs are always numpy arrays.
@@ -85,7 +97,7 @@ class NeuralNetwork:
 
 # Example network:
 
-# nn = NeuralNetwork()
+# nn = NeuralNetwork(1,1,[5,5,5])
 # x = np.array([[7485],[6503],[4719]], dtype = float)
 # x = x/8000
 # y = np.array([[7000],[6000],[2000]], dtype = float)
