@@ -16,5 +16,5 @@ The NeuralNetwork Class allows for the creation of Neural Network objects, which
 ### forward(numpy.Array x), returns numpy.Array y
 This method takes an input *x* and uses the network to generate an output *y*.  
 *x* is a NumPy Array object that contains input values for the network.  
-Each row of the NumPy arraw contains one set of input values.  
+Each row of the NumPy Array contains one set of input values.  
 If the input layer is of size *n*, then each row much contain *n* values. Using multiple rows in the array will allow for multiple outputs to be calculated, which are returned, as *y*, in the same format as input *x*.
