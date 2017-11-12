@@ -13,7 +13,7 @@ The NeuralNetwork Class allows for the creation of Neural Network objects, which
   
 *NeuralNetwork(2,1,[3,3,3])* will generate a NeuralNetwork object with 2 input nodes, 1 output node, and 3 hidden layers with 3 nodes each.  
 
-### forward(numpy.Array x), returns numpy.Array y
+### forward(numpy.Array x), returns numpy.Array
 This method takes an input *x* and uses the network to generate an output *y*.  
 *x* is a NumPy Array object that contains input values for the network.  
 Each row of the NumPy Array contains one set of input values.  
